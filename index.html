@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCNA 2 v7 — Study & Battle</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+/* ══════════════════════════════════════════
+   SHARED BASE
+══════════════════════════════════════════ */
+:root {
+  --bg:       #0f172a;
+  --card:     #1e293b;
+  --card2:    #273349;
+  --border:   #334155;
+  --primary:  #38bdf8;
+  --pd:       #0ea5e9;
+  --accent:   #f59e0b;
+  --correct:  #22c55e;
+  --wrong:    #ef4444;
+  --text:     #f1f5f9;
+  --muted:    #94a3b8;
+  --p1c:      #818cf8;
+  --p2c:      #f472b6;
+  --r: 12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* ── VIEWS ── */
+.view{display:none;flex:1;flex-direction:column}
+.view.active{display:flex}
+
+/* ── TOP NAV ── */
+#topnav{background:rgba(15,23,42,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:52px;gap:8px;position:sticky;top:0;z-index:200;flex-shrink:0}
+#topnav .brand{font-weight:900;font-size:1rem;background:linear-gradient(90deg,var(--primary),var(--p1c));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1;white-space:nowrap}
+.tnav-btn{padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:.83rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tnav-btn:hover{border-color:var(--primary);color:var(--primary)}
+.tnav-btn.active{background:var(--primary);color:#0f172a;border-color:var(--primary);font-weight:700}
+
+/* ══════════════════════════════════════════
+   MAIN HOME
+══════════════════════════════════════════ */
+#main-home{align-items:center;justify-content:center;padding:32px 16px;text-align:center}
+.hero-title{font-size:clamp(2rem,6vw,3.4rem);font-weight:900;background:linear-gradient(135deg,var(--primary),var(--p1c),var(--p2c));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+.hero-sub{color:var(--muted);font-size:1rem;margin-bottom:40px;max-width:500px}
+.big-cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:680px;width:100%;margin-bottom:24px}
+@media(max-width:520px){.big-cards{grid-template-columns:1fr}}
+.big-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:32px 24px;cursor:pointer;transition:border-color .2s,transform .15s,box-shadow .2s}
+.big-card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(56,189,248,.12)}
+.big-card.study{border-color:var(--p1c)}
+.big-card.battle{border-color:var(--p2c)}
+.big-card:hover.study{border-color:var(--p1c);box-shadow:0 8px 32px rgba(129,140,248,.2)}
+.big-card:hover.battle{border-color:var(--p2c);box-shadow:0 8px 32px rgba(244,114,182,.2)}
+.bc-icon{font-size:2.8rem;margin-bottom:12px}
+.bc-title{font-size:1.2rem;font-weight:800;margin-bottom:6px}
+.bc-sub{font-size:.83rem;color:var(--muted);line-height:1.5}
+.bc-pill{display:inline-flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.pill{font-size:.73rem;padding:2px 10px;border-radius:10px;border:1px solid var(--border);color:var(--muted)}
+
+/* ══════════════════════════════════════════
+   STUDY SECTION
+══════════════════════════════════════════ */
+#study-home{align-items:center;justify-content:flex-start;padding:28px 16px}
+.section-header{max-width:860px;width:100%;margin:0 auto 20px}
+.section-header h2{font-size:1.4rem;font-weight:800;margin-bottom:4px}
+.section-header p{color:var(--muted);font-size:.88rem}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;max-width:860px;width:100%;margin:0 auto 20px}
+.topic-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:20px;cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.topic-card:hover{border-color:var(--primary);box-shadow:0 4px 16px rgba(56,189,248,.12)}
+.topic-card h3{font-size:.95rem;margin-bottom:5px;color:var(--primary)}
+.topic-card p{font-size:.8rem;color:var(--muted);margin-bottom:10px}
+.badge{font-size:.72rem;background:rgba(56,189,248,.15);color:var(--primary);padding:2px 10px;border-radius:10px;border:1px solid rgba(56,189,248,.3)}
+.mode-btns-row{display:flex;gap:10px;flex-wrap:wrap;max-width:860px;width:100%;margin:0 auto}
+.mbtn{padding:10px 24px;border-radius:var(--r);font-size:.95rem;font-weight:700;cursor:pointer;border:none;transition:opacity .15s}
+.mbtn:hover{opacity:.85}
+.mbtn.quiz{background:var(--primary);color:#0f172a}
+.mbtn.flash{background:transparent;color:var(--primary);border:2px solid var(--primary)}
+.mbtn.gray{background:var(--card2);color:var(--text);border:1.5px solid var(--border)}
+
+/* Stats bar */
+.stats-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;max-width:800px;width:100%;margin-left:auto;margin-right:auto}
+.stat{background:var(--card);border-radius:8px;padding:8px 16px;font-size:.82rem;border:1px solid var(--border);flex:1;min-width:70px}
+.stat span{font-weight:700;font-size:1.1rem;display:block}
+.stat.c span{color:var(--correct)}
+.stat.w span{color:var(--wrong)}
+.stat.t span{color:var(--primary)}
+
+/* QUIZ */
+#quiz-view{align-items:center;padding:20px 16px}
+.quiz-wrap{max-width:800px;width:100%;margin:0 auto}
+.progress-bar{height:5px;background:var(--border);border-radius:3px;margin-bottom:16px;overflow:hidden}
+.progress-fill{height:100%;background:var(--primary);border-radius:3px;transition:width .4s}
+.question-card{background:var(--card);border-radius:var(--r);padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.1);margin-bottom:12px}
+.question-meta{font-size:.74rem;color:var(--muted);margin-bottom:7px}
+.question-text{font-size:1rem;font-weight:600;margin-bottom:16px;line-height:1.55}
+.options{display:flex;flex-direction:column;gap:8px}
+.option{display:flex;align-items:flex-start;gap:9px;padding:10px 14px;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;font-size:.92rem;line-height:1.4}
+.option input{margin-top:2px;flex-shrink:0;accent-color:var(--primary);transform:scale(1.15)}
+.option:hover:not(.locked){border-color:var(--primary);background:rgba(56,189,248,.07)}
+.option.correct{border-color:var(--correct)!important;background:rgba(34,197,94,.1)!important}
+.option.incorrect{border-color:var(--wrong)!important;background:rgba(239,68,68,.08)!important}
+.option.locked{cursor:default}
+.check-btn{margin-top:12px;padding:9px 24px;background:var(--primary);color:#0f172a;border:none;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer}
+.check-btn:hover{background:var(--pd)}
+.check-btn:disabled{opacity:.4;cursor:default}
+.explanation{margin-top:12px;padding:12px 16px;background:rgba(34,197,94,.06);border-left:4px solid var(--correct);border-radius:6px;font-size:.88rem;line-height:1.58}
+.explanation.wrong{border-color:var(--wrong);background:rgba(239,68,68,.06)}
+.nav-btns-q{display:flex;gap:8px;margin-top:10px}
+.nav-btns-q button{flex:1;padding:8px;border:2px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-size:.9rem;font-weight:600;color:var(--text)}
+.nav-btns-q button:hover:not(:disabled){border-color:var(--primary);color:var(--primary)}
+.nav-btns-q button:disabled{opacity:.35;cursor:default}
+.result-card{background:var(--card);border-radius:var(--r);padding:36px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.result-card h2{font-size:1.7rem;margin-bottom:6px}
+.score-circle{width:100px;height:100px;border-radius:50%;border:7px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.7rem;font-weight:700;color:var(--primary);margin:16px auto}
+.result-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+
+/* FLASHCARDS */
+#flash-view{align-items:center;padding:20px 16px}
+.flash-wrap{max-width:660px;width:100%;margin:0 auto}
+.flash-progress{display:flex;justify-content:space-between;font-size:.84rem;color:var(--muted);margin-bottom:10px}
+.flashcard-scene{perspective:1000px;height:300px;cursor:pointer;margin-bottom:14px}
+.flashcard{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,.2,.2,1)}
+.flashcard.flipped{transform:rotateY(180deg)}
+.flashcard-front,.flashcard-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:var(--r);padding:26px 22px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,.15)}
+.flashcard-front{background:linear-gradient(135deg,#0288d1,#0262a8);color:#fff}
+.flashcard-back{background:var(--card);transform:rotateY(180deg);border:2px solid var(--border)}
+.fc-tag{font-size:.7rem;opacity:.75;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.fc-q{font-size:1rem;font-weight:600;line-height:1.55}
+.fc-ans{font-size:.97rem;color:var(--correct);font-weight:700;line-height:1.5;margin-bottom:8px}
+.fc-exp{font-size:.8rem;color:var(--muted);line-height:1.5}
+.flash-tap-hint{font-size:.77rem;color:var(--muted);text-align:center;margin-bottom:12px}
+.flash-nav{display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:10px}
+.flash-nav button{padding:8px 20px;border:2px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-size:.9rem;font-weight:600;color:var(--text)}
+.flash-nav button:hover{border-color:var(--primary);color:var(--primary)}
+.flash-counter{font-size:.9rem;color:var(--muted);min-width:68px;text-align:center}
+.flash-extras{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.known-btn{padding:7px 16px;background:var(--correct);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:.86rem}
+.known-btn:hover{opacity:.85}
+.ghost-btn{padding:7px 16px;background:transparent;color:var(--muted);border:2px solid var(--border);border-radius:8px;cursor:pointer;font-size:.86rem}
+.ghost-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+/* ══════════════════════════════════════════
+   BATTLE SECTION
+══════════════════════════════════════════ */
+#battle-lobby{align-items:center;justify-content:center;padding:28px 16px;text-align:center}
+.battle-logo{font-size:2.4rem;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--p1c),var(--p2c));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.battle-tag{color:var(--muted);margin-bottom:28px;font-size:.92rem}
+.lobby-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:500px;width:100%;margin-bottom:20px}
+@media(max-width:450px){.lobby-cards{grid-template-columns:1fr}}
+.lcard{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:26px 18px;cursor:pointer;transition:border-color .2s,transform .15s}
+.lcard:hover{transform:translateY(-2px)}
+.lcard.host{border-color:var(--p1c)}
+.lcard.guest{border-color:var(--p2c)}
+.lcard .icon{font-size:2rem;margin-bottom:8px}
+.lcard h3{font-size:1rem;margin-bottom:5px}
+.lcard p{font-size:.78rem;color:var(--muted)}
+
+/* Room panel */
+.bview{flex:1;align-items:center;justify-content:center;padding:24px 16px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:28px 24px;max-width:460px;width:100%}
+.panel h2{margin-bottom:5px}
+.panel p.sub{color:var(--muted);font-size:.85rem;margin-bottom:20px}
+.link-box{background:var(--bg);border:2px solid var(--primary);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:.85rem;word-break:break-all;margin-bottom:10px;color:var(--primary)}
+.btn{display:inline-block;padding:11px 26px;border:none;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s;text-decoration:none}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--primary);color:#0f172a}
+.btn-p:hover{opacity:.88}
+.btn-s{background:var(--card2);color:var(--text);border:1.5px solid var(--border)}
+.btn-s:hover{border-color:var(--primary)}
+.btn-sm{padding:6px 14px;font-size:.82rem}
+.badge-wait{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.76rem;font-weight:700;background:rgba(245,158,11,.12);color:var(--accent);border:1px solid var(--accent)}
+.waiting-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:5px;animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.code-big{font-size:1.9rem;font-weight:900;letter-spacing:6px;color:var(--primary);margin:8px 0}
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+.code-input{background:var(--bg);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:1.3rem;font-weight:700;letter-spacing:5px;text-align:center;padding:11px 18px;width:100%;outline:none;text-transform:uppercase;margin-bottom:12px}
+.code-input:focus{border-color:var(--primary)}
+.error-msg{color:var(--wrong);font-size:.83rem;margin-bottom:8px;min-height:18px}
+.topic-select{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+.topic-pill{padding:5px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:.8rem;cursor:pointer;color:var(--muted);transition:all .15s}
+.topic-pill.active{border-color:var(--primary);color:var(--primary);background:rgba(56,189,248,.08);font-weight:700}
+.name-input{background:var(--bg);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:.97rem;padding:10px 14px;width:100%;outline:none;margin-bottom:0}
+.name-input:focus{border-color:var(--primary)}
+.input-label{font-size:.8rem;color:var(--muted);display:block;margin-bottom:6px}
+.input-wrap{margin-bottom:14px}
+
+/* Countdown */
+#battle-countdown{align-items:center;justify-content:center}
+.countdown-num{font-size:8rem;font-weight:900;color:var(--primary);animation:pop .8s ease-out}
+@keyframes pop{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.countdown-label{font-size:1rem;color:var(--muted);margin-top:-8px}
+
+/* Game */
+#battle-game{flex-direction:column}
+.scoreboard{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;background:var(--card);border-bottom:2px solid var(--border);padding:8px 12px;flex-shrink:0}
+.ps-chip{display:flex;flex-direction:column;align-items:center;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:6px 12px;min-width:70px}
+.ps-name{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ps-pts{font-size:1.4rem;font-weight:900;color:var(--primary);text-align:center}
+.center-timer{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 0;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0}
+.round-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.round-num{font-size:1rem;font-weight:700}
+.timer-ring{width:40px;height:40px;margin-top:4px}
+.timer-ring circle{fill:none;stroke-width:4}
+.timer-bg{stroke:var(--border)}
+.timer-arc{stroke:var(--primary);stroke-linecap:round;transition:stroke-dashoffset .95s linear,stroke .3s;transform-origin:center;transform:rotate(-90deg)}
+.game-body{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;max-width:720px;width:100%;margin:0 auto;overflow-y:auto}
+.q-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:22px;width:100%;margin-bottom:14px}
+.q-num{font-size:.73rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+.q-text{font-size:1rem;font-weight:600;line-height:1.55}
+.tag-mod{font-size:.68rem;padding:2px 8px;border-radius:8px;background:rgba(56,189,248,.1);color:var(--primary);display:inline-block;margin-bottom:7px}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%}
+@media(max-width:480px){.opts-grid{grid-template-columns:1fr}}
+.opt-btn{background:var(--card);border:2px solid var(--border);border-radius:10px;color:var(--text);font-size:.9rem;padding:12px 14px;cursor:pointer;text-align:left;line-height:1.4;transition:border-color .15s,background .15s,transform .1s}
+.opt-btn:hover:not(:disabled){border-color:var(--primary);background:rgba(56,189,248,.08)}
+.opt-btn:active:not(:disabled){transform:scale(.97)}
+.opt-btn:disabled{cursor:default}
+.opt-btn.selected{border-color:var(--primary);background:rgba(56,189,248,.1)}
+.opt-btn.reveal-correct{border-color:var(--correct)!important;background:rgba(34,197,94,.1)!important}
+.opt-btn.b-correct{border-color:var(--correct)!important;background:rgba(34,197,94,.1)!important}
+.opt-btn.b-incorrect{border-color:var(--wrong)!important;background:rgba(239,68,68,.08)!important}
+.opt-letter{display:inline-block;width:20px;height:20px;border-radius:4px;background:var(--border);font-size:.68rem;font-weight:700;text-align:center;line-height:20px;margin-right:7px;flex-shrink:0}
+.multi-hint{font-size:.74rem;color:var(--accent);margin-bottom:9px}
+.submit-row{display:flex;width:100%;margin-top:4px}
+.submit-row .btn{flex:1;text-align:center}
+.fb-banner{border-radius:10px;padding:11px 18px;margin-bottom:10px;font-weight:700;font-size:.93rem;text-align:center;width:100%}
+.fb-banner.win{background:rgba(34,197,94,.12);border:1.5px solid var(--correct);color:var(--correct)}
+.fb-banner.lose{background:rgba(239,68,68,.08);border:1.5px solid var(--wrong);color:var(--wrong)}
+.fb-banner.tie{background:rgba(245,158,11,.08);border:1.5px solid var(--accent);color:var(--accent)}
+.fb-banner.info{background:rgba(56,189,248,.08);border:1.5px solid var(--primary);color:var(--primary)}
+.exp-box{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;font-size:.84rem;color:var(--muted);line-height:1.55;margin-top:4px;width:100%}
+.spinner{width:44px;height:44px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wait-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:14px;padding:40px 20px;text-align:center}
+
+/* Battle Results */
+#battle-results{align-items:center;justify-content:center;padding:28px 16px;text-align:center}
+.trophy{font-size:4.5rem;margin-bottom:6px}
+.res-title{font-size:1.9rem;font-weight:900;margin-bottom:5px}
+.res-title.win{color:var(--correct)}
+.res-title.lose{color:var(--wrong)}
+.res-title.draw{color:var(--accent)}
+.score-summary{display:flex;gap:12px;margin:18px 0;justify-content:center;flex-wrap:wrap;max-width:600px;width:100%}
+.ss-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:14px 20px;min-width:110px;text-align:center}
+.ss-name{font-size:.75rem;color:var(--muted);text-transform:uppercase;margin-bottom:3px}
+.ss-pts{font-size:2rem;font-weight:900;color:var(--primary)}
+.res-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+
+/* Toasts */
+.toast-area{position:fixed;top:10px;right:10px;z-index:999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:.83rem;max-width:270px;animation:slideIn .3s ease;pointer-events:all}
+@keyframes slideIn{from{opacity:0;transform:translateX(28px)}}
+.back-btn{position:fixed;top:60px;left:12px;background:var(--card);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:5px 11px;font-size:.8rem;cursor:pointer;z-index:50}
+.back-btn:hover{color:var(--text);border-color:var(--primary)}
+
+@media(max-width:600px){
+  .question-text,.q-text{font-size:.93rem}
+  .flashcard-scene{height:260px}
+  .fc-q{font-size:.95rem}
+  .big-cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav id="topnav">
+  <span class="brand">📡 CCNA 2 v7</span>
+  <button class="tnav-btn active" id="tn0" onclick="goMain()">🏠 Home</button>
+  <button class="tnav-btn" id="tn1" onclick="goStudy()">📚 Study</button>
+  <button class="tnav-btn" id="tn2" onclick="goBattle()">⚡ Battle</button>
+</nav>
+
+<!-- TOAST AREA -->
+<div class="toast-area" id="toasts"></div>
+
+<!-- ═══════════════════════════════════
+     MAIN HOME
+═══════════════════════════════════ -->
+<div class="view active" id="main-home">
+  <div class="hero-title">CCNA 2 v7</div>
+  <p class="hero-sub">Modules 1–4 &amp; 5–6 · Switching, VLANs, STP, EtherChannel</p>
+  <div class="big-cards">
+    <div class="big-card study" onclick="goStudy()">
+      <div class="bc-icon">📚</div>
+      <div class="bc-title">Study Mode</div>
+      <div class="bc-sub">Solo quiz with explanations, flashcards, and topic filter</div>
+      <div class="bc-pill">
+        <span class="pill">❓ Quiz</span>
+        <span class="pill">🃏 Flashcards</span>
+        <span class="pill">100 Questions</span>
+      </div>
+    </div>
+    <div class="big-card battle" onclick="goBattle()">
+      <div class="bc-icon">⚡</div>
+      <div class="bc-title">Battle Mode</div>
+      <div class="bc-sub">Real-time multiplayer — up to 8 players, share a link and race to answer first!</div>
+      <div class="bc-pill">
+        <span class="pill">🔗 Share link</span>
+        <span class="pill">⏱ Live timer</span>
+        <span class="pill">Up to 8 Players</span>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:.78rem;color:var(--muted)">No account needed · Works on mobile · Upload to Netlify and share</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     STUDY → HOME
+═══════════════════════════════════ -->
+<div class="view" id="study-home">
+  <div class="section-header">
+    <h2>📚 Study Mode</h2>
+    <p>Choose a topic and mode to begin</p>
+  </div>
+  <div class="topic-grid">
+    <div class="topic-card" onclick="sFilterStart('quiz','1-4')">
+      <h3>🔀 Modules 1–4</h3>
+      <p>Switching Concepts, VLANs, InterVLAN Routing</p>
+      <span class="badge">45 Questions</span>
+    </div>
+    <div class="topic-card" onclick="sFilterStart('quiz','5-6')">
+      <h3>🌐 Modules 5–6</h3>
+      <p>Redundant Networks — STP, RSTP, PVST+, EtherChannel</p>
+      <span class="badge">55 Questions</span>
+    </div>
+    <div class="topic-card" onclick="sFilterStart('quiz','all')">
+      <h3>📚 All Topics</h3>
+      <p>Combined review of Modules 1–4 and 5–6</p>
+      <span class="badge">100 Questions</span>
+    </div>
+  </div>
+  <div class="mode-btns-row">
+    <button class="mbtn quiz" onclick="sFilterStart('quiz','all')">❓ Start Quiz</button>
+    <button class="mbtn flash" onclick="sFilterStart('flash','all')">🃏 Flashcards</button>
+  </div>
+</div>
+
+<!-- STUDY → QUIZ -->
+<div class="view" id="quiz-view">
+  <div class="quiz-wrap" id="quiz-inner"></div>
+</div>
+
+<!-- STUDY → FLASH -->
+<div class="view" id="flash-view">
+  <div class="flash-wrap" id="flash-inner"></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     BATTLE → LOBBY
+═══════════════════════════════════ -->
+<div class="view" id="battle-lobby">
+  <div class="battle-logo">⚡ CCNA Battle</div>
+  <p class="battle-tag">Real-time multiplayer — up to 8 players! Race to answer first!</p>
+  <div class="lobby-cards">
+    <div class="lcard host" onclick="bShowCreate()">
+      <div class="icon">🏠</div>
+      <h3>Create Room</h3>
+      <p>Host a game and share your link</p>
+    </div>
+    <div class="lcard guest" onclick="bShowJoin()">
+      <div class="icon">🔗</div>
+      <h3>Join Room</h3>
+      <p>Enter a code or open an invite link</p>
+    </div>
+  </div>
+  <div style="font-size:.78rem;color:var(--muted)">Powered by WebRTC · No server needed</div>
+</div>
+
+<!-- BATTLE → CREATE -->
+<div class="view bview" id="battle-create">
+  <button class="back-btn" onclick="bBack()">← Back</button>
+  <div class="panel">
+    <h2>🏠 Create Room</h2>
+    <p class="sub">Set up the game and share the link with your opponent.</p>
+    <div class="input-wrap">
+      <label class="input-label">Your name</label>
+      <input id="host-name" class="name-input" placeholder="Enter your name" maxlength="20">
+    </div>
+    <div class="input-wrap">
+      <label class="input-label">Topic</label>
+      <div class="topic-select" id="host-topic">
+        <div class="topic-pill active" data-v="all" onclick="setHostTopic(this)">All Modules</div>
+        <div class="topic-pill" data-v="1-4" onclick="setHostTopic(this)">Modules 1–4</div>
+        <div class="topic-pill" data-v="5-6" onclick="setHostTopic(this)">Modules 5–6</div>
+      </div>
+    </div>
+    <div class="input-wrap">
+      <label class="input-label">Rounds</label>
+      <div class="topic-select" id="host-rounds">
+        <div class="topic-pill" data-v="5"  onclick="setRounds(this)">5</div>
+        <div class="topic-pill active" data-v="10" onclick="setRounds(this)">10</div>
+        <div class="topic-pill" data-v="15" onclick="setRounds(this)">15</div>
+        <div class="topic-pill" data-v="20" onclick="setRounds(this)">20</div>
+        <div class="topic-pill" data-v="25" onclick="setRounds(this)">25</div>
+        <div class="topic-pill" data-v="30" onclick="setRounds(this)">30</div>
+        <div class="topic-pill" data-v="999" onclick="setRounds(this)">All</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+        <span style="font-size:.8rem;color:var(--muted);white-space:nowrap">Custom:</span>
+        <input id="custom-rounds" type="number" min="1" max="100" placeholder="e.g. 7"
+          style="background:var(--bg);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:.95rem;font-weight:700;padding:6px 12px;width:100px;outline:none;text-align:center"
+          oninput="setCustomRounds(this)">
+        <span style="font-size:.78rem;color:var(--muted)" id="rounds-max-hint">(max 100)</span>
+      </div>
+    </div>
+    <div class="input-wrap">
+      <label class="input-label">⏱ Timer per question</label>
+      <div class="topic-select" id="host-timer">
+        <div class="topic-pill" data-v="5" onclick="setTimer(this)">5s</div>
+        <div class="topic-pill" data-v="10" onclick="setTimer(this)">10s</div>
+        <div class="topic-pill active" data-v="15" onclick="setTimer(this)">15s</div>
+        <div class="topic-pill" data-v="20" onclick="setTimer(this)">20s</div>
+        <div class="topic-pill" data-v="30" onclick="setTimer(this)">30s</div>
+        <div class="topic-pill" data-v="45" onclick="setTimer(this)">45s</div>
+        <div class="topic-pill" data-v="60" onclick="setTimer(this)">60s</div>
+      </div>
+    </div>
+    <button class="btn btn-p" style="width:100%;margin-bottom:14px" onclick="createRoom()">Generate Room ⚡</button>
+    <div id="room-created" style="display:none">
+      <hr class="divider">
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:5px">Share this link:</div>
+      <div class="link-box" id="share-link"></div>
+      <div style="display:flex;gap:7px;margin-bottom:14px">
+        <button class="btn btn-s btn-sm" style="flex:1" onclick="copyLink()">📋 Copy Link</button>
+        <button class="btn btn-s btn-sm" style="flex:1" onclick="copyCode()">🔑 Copy Code</button>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:5px">Room Code</div>
+        <div class="code-big" id="room-code-display">----</div>
+        <div style="margin-top:8px">
+          <span class="badge-wait" id="wait-badge"><span class="waiting-dot"></span>Waiting for players… <span id="player-count">0/7</span></span>
+        </div>
+        <div id="player-list" style="margin-top:10px;font-size:.82rem;color:var(--muted);text-align:left;min-height:20px"></div>
+        <button class="btn btn-p" id="start-btn" style="width:100%;margin-top:14px;display:none" onclick="hostForceStart()">▶ Start Game Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BATTLE → JOIN -->
+<div class="view bview" id="battle-join">
+  <button class="back-btn" onclick="bBack()">← Back</button>
+  <div class="panel">
+    <h2>🔗 Join Room</h2>
+    <p class="sub">Enter the room code or paste the invite link.</p>
+    <div class="input-wrap">
+      <label class="input-label">Your name</label>
+      <input id="guest-name" class="name-input" placeholder="Enter your name" maxlength="20">
+    </div>
+    <label class="input-label">Room Code</label>
+    <input id="join-code" class="code-input" placeholder="XXXXXX" maxlength="12" oninput="this.value=this.value.toUpperCase()">
+    <div class="error-msg" id="join-error"></div>
+    <button class="btn btn-p" style="width:100%" onclick="joinRoom()">Join Game →</button>
+  </div>
+</div>
+
+<!-- BATTLE → COUNTDOWN -->
+<div class="view" id="battle-countdown">
+  <div class="countdown-num" id="cnt-num">3</div>
+  <div class="countdown-label">Get ready!</div>
+</div>
+
+<!-- BATTLE → GAME -->
+<div class="view" id="battle-game">
+  <div class="scoreboard" id="scoreboard-row">
+    <!-- dynamically filled -->
+  </div>
+  <div class="center-timer">
+    <div class="round-label">Round</div>
+    <div class="round-num" id="round-display">1/10</div>
+    <svg class="timer-ring" viewBox="0 0 44 44">
+      <circle class="timer-bg" cx="22" cy="22" r="18"/>
+      <circle class="timer-arc" id="timer-arc" cx="22" cy="22" r="18" stroke-dasharray="113" stroke-dashoffset="0"/>
+    </svg>
+  </div>
+  <div class="game-body" id="game-body">
+    <div class="wait-state"><div class="spinner"></div><div>Loading…</div></div>
+  </div>
+</div>
+
+<!-- BATTLE → RESULTS -->
+<div class="view" id="battle-results">
+  <div class="trophy" id="res-trophy">🏆</div>
+  <div class="res-title" id="res-title">Game Over</div>
+  <div style="color:var(--muted);margin-bottom:12px" id="res-sub"></div>
+  <div class="score-summary" id="res-leaderboard">
+    <!-- dynamically filled -->
+  </div>
+  <div class="res-btns">
+    <button class="btn btn-p" onclick="bPlayAgain()">🔄 Play Again</button>
+    <button class="btn btn-s" onclick="goBattle()">🏠 Battle Home</button>
+    <button class="btn btn-s" onclick="goMain()">🌐 Main Menu</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  QUESTION DATA (shared by study + battle)
+// ════════════════════════════════════════════════════════
+const QS = [
+/* ── Modules 1-4 (47 questions) ── */
+{m:'1-4',q:'What characteristic of store-and-forward switching allows it to support different Ethernet speeds?',opts:['Error checking on incoming frames','Using ASICs for hardware decisions','Using buffers to hold incoming frames','Low latency through the switch'],ans:[2],exp:'Store-and-forward buffers the entire frame before forwarding, supporting different ingress/egress speeds.'},
+{m:'1-4',q:'Which switching method starts forwarding immediately after reading the destination MAC address?',opts:['store-and-forward','fragment-free','cut-through','FCS-based'],ans:[2],exp:'Cut-through starts forwarding as soon as it reads the destination MAC — lowest latency, no error checking.'},
+{m:'1-4',q:'Which switching method checks the entire frame for errors before forwarding?',opts:['cut-through','fragment-free','fast-forward','store-and-forward'],ans:[3],exp:'Store-and-forward reads the entire frame including FCS, verifies it, then forwards.'},
+{m:'1-4',q:'Which two are characteristics of cut-through switching? (Choose two.)',opts:['Errors are detected before forwarding','Forwarding decisions made as soon as dest. MAC is read','Latency is low and constant','Frames are buffered for speed matching','All frames checked for corruption'],ans:[1,2],exp:'Cut-through: reads only the destination MAC, very low and constant latency, but no error checking.'},
+{m:'1-4',q:'Which two are characteristics of store-and-forward switching? (Choose two.)',opts:['Invalid frames can be detected and dropped','Very low constant latency','Uses buffers to support different Ethernet speeds','Only destination MAC checked','Frames forwarded before fully received'],ans:[0,2],exp:'Store-and-forward checks the entire frame for errors and uses buffers to handle speed mismatches between ports.'},
+{m:'1-4',q:'What is the significant difference between a hub and a Layer 2 LAN switch?',opts:['A hub extends a collision domain, and a switch divides collision domains.','A hub divides collision domains, and a switch divides broadcast domains.','Each port of a hub is a collision domain, and each port of a switch is a broadcast domain.','A hub forwards frames, and a switch forwards only packets.'],ans:[0],exp:'Hubs extend one large collision domain. Each switch port creates its own separate collision domain.'},
+{m:'1-4',q:'Which statement is correct about Ethernet switch frame forwarding decisions?',opts:['Frame forwarding decisions are based on MAC address and port mappings in the CAM table.','Cut-through frame forwarding ensures invalid frames are always dropped.','Only broadcast frames are forwarded out all active switch ports.','Unicast frames are always forwarded regardless of the destination MAC.'],ans:[0],exp:'Switches make forwarding decisions by looking up the destination MAC in the Content Addressable Memory (CAM) table.'},
+{m:'1-4',q:'How do switch buffers affect network performance?',opts:['They provide error checking on received data','They store frames, preventing drops during congestion','They support autonegotiation when it fails','They hold data during collisions until resumption'],ans:[1],exp:'Buffers store frames when an egress port is congested, preventing premature drops.'},
+{m:'1-4',q:'Which switch characteristic helps keep traffic local and alleviates network congestion?',opts:['high port density','fast port speed','large frame buffers','fast internal switching'],ans:[0],exp:'High port density means more devices share the same switch, keeping their traffic local and reducing inter-switch traffic.'},
+{m:'1-4',q:'Which switch component reduces the amount of packet handling time inside the switch?',opts:['ASIC','dual processors','large buffer size','store-and-forward RAM'],ans:[0],exp:'ASICs are dedicated hardware chips that process frames much faster than software-based switching.'},
+{m:'1-4',q:'What information is added to the switch MAC table from incoming frames?',opts:['source MAC address and incoming port number','destination MAC address and incoming port number','source IP address and incoming port number','destination IP address and incoming port number'],ans:[0],exp:'A switch learns by recording the SOURCE MAC + incoming port number in the MAC address table.'},
+{m:'1-4',q:'Which switching method ensures that the incoming frame is error-free before forwarding?',opts:['cut-through','FCS','fragment free','store-and-forward'],ans:[3],exp:'Store-and-forward performs error checking on the frame using the FCS value before forwarding.'},
+{m:'1-4',q:'How many broadcast domains are shown in a network with 4 router links and 4 attached LANs?',opts:['1','4','8','16'],ans:[2],exp:'Each router interface defines a broadcast domain. 4 inter-router links + 4 LAN segments = 8 broadcast domains.'},
+{m:'1-4',q:'Under which two occasions should an administrator disable DTP? (Choose two.)',opts:['when connecting a Cisco switch to a non-Cisco switch','when a neighbor switch uses DTP dynamic auto','when a neighbor switch uses DTP dynamic desirable','on links that should not be trunking','on links that should dynamically attempt trunking'],ans:[0,3],exp:'Disable DTP when connecting to non-Cisco switches and on access ports where trunking should never happen.'},
+{m:'1-4',q:'Which two characteristics describe the native VLAN? (Choose two.)',opts:['Designed to carry user traffic; also known as the default VLAN.','The native VLAN traffic will be untagged across the trunk link.','This VLAN is necessary for remote management of a switch.','High priority traffic such as voice uses the native VLAN.','The native VLAN provides a common identifier to both ends of a trunk.'],ans:[1,4],exp:'Native VLAN traffic crosses trunks untagged and provides a common identifier to both trunk endpoints.'},
+{m:'1-4',q:'On a switch configured with multiple VLANs, which command will remove only VLAN 100?',opts:['Switch# delete flash:vlan.dat','Switch(config-if)# no switchport access vlan 100','Switch(config-if)# no switchport trunk allowed vlan 100','Switch(config)# no vlan 100'],ans:[3],exp:'"no vlan 100" in global config removes just that one VLAN. "delete flash:vlan.dat" removes ALL VLANs.'},
+{m:'1-4',q:'Why would interfaces Gi0/1 and Gi0/2 not appear in the "show vlan brief" output?',opts:['There is a native VLAN mismatch.','There is no media connected.','They are administratively shut down.','They are configured as trunk interfaces.'],ans:[3],exp:'Trunk ports do not belong to any single VLAN and are not listed in "show vlan brief" output.'},
+{m:'1-4',q:'A device in VLAN 20 sends a broadcast Ethernet frame across a multi-switch network. What happens?',opts:['All devices in all VLANs see the frame.','Devices in VLAN 20 and management VLAN see the frame.','Only devices in VLAN 20 see the frame.','Only devices connected to the local switch see the frame.'],ans:[2],exp:'VLANs create separate broadcast domains. A VLAN 20 broadcast is confined to VLAN 20 members only.'},
+{m:'1-4',q:'All workstations are in VLAN 20 but SW1 cannot reach SW2. What should be done?',opts:['Allow VLAN 20 on the trunk link.','Enable DTP on both ends of the trunk.','Configure all workstations on SW1 to the default VLAN.','Configure all workstations on SW2 to the native VLAN.'],ans:[0],exp:'VLAN 20 must be explicitly allowed on the trunk link between SW1 and SW2 for traffic to pass.'},
+{m:'1-4',q:'What happens to switch ports after the VLAN to which they are assigned is deleted?',opts:['The ports are disabled.','The ports are placed in trunk mode.','The ports are assigned to VLAN 1, the default VLAN.','The ports stop communicating with attached devices.'],ans:[3],exp:'Ports in a deleted VLAN become inactive until reassigned to an active VLAN.'},
+{m:'1-4',q:'In what switch mode should port G0/1 be assigned when a router is connected for inter-VLAN routing?',opts:['access','trunk','native','auto'],ans:[1],exp:'The switch port connecting to a router for inter-VLAN routing must be in trunk mode to carry all VLANs.'},
+{m:'1-4',q:'Port Fa0/11 is assigned to VLAN 30. If "no switchport access vlan 30" is entered, what happens?',opts:['Port Fa0/11 will be shutdown.','An error message would be displayed.','Port Fa0/11 will be returned to VLAN 1.','VLAN 30 will be deleted.'],ans:[2],exp:'Removing the VLAN assignment returns the port to default VLAN 1. VLAN 30 itself is not deleted.'},
+{m:'1-4',q:'Which command displays the encapsulation type, voice VLAN ID, and access mode VLAN for Fa0/1?',opts:['show vlan brief','show interfaces Fa0/1 switchport','show mac address-table interface Fa0/1','show interfaces trunk'],ans:[1],exp:'"show interfaces Fa0/1 switchport" shows encapsulation, access VLAN, voice VLAN, and trunking info.'},
+{m:'1-4',q:'A technician configures SW3 Fa0/20 for voice and data but uses an incorrect command. What is wrong?',opts:['There is nothing wrong with the configuration.','Interface Fa0/20 can only have one VLAN assigned.','The mls qos trust cos command should reference VLAN 35.','The command used to assign the voice VLAN to the switch port is incorrect.'],ans:[3],exp:'The voice VLAN must be configured with "switchport voice vlan <id>", not an access vlan command.'},
+{m:'1-4',q:'Which four steps are needed to configure a voice VLAN on a switch port? (Choose four.)',opts:['Configure the interface as an 802.1Q trunk.','Assign the voice VLAN to the switch port.','Activate spanning-tree PortFast on the interface.','Ensure voice traffic is trusted and tagged with a CoS priority value.','Add a voice VLAN.','Configure the switch port interface with subinterfaces.','Assign a data VLAN to the switch port.','Configure the switch port in access mode.'],ans:[1,3,4,7],exp:'To add VoIP: configure access mode, add voice VLAN, trust CoS, and assign voice VLAN to the port.'},
+{m:'1-4',q:'PC1 cannot reach Server1. The "show interfaces trunk" shows G0/2 is not listed. What is the problem?',opts:['Interface G0/2 is not configured as a trunk.','VLAN 20 has not been created.','The encapsulation on G0/1 is incorrect.','The DTP mode on G0/1 is set to dynamic auto.'],ans:[0],exp:'A missing interface in "show interfaces trunk" means it has not been configured as a trunk link.'},
+{m:'1-4',q:'What is the cause of the error when "encapsulation dot1Q 20" is missing on a subinterface?',opts:['The gig0/0 interface does not support inter-VLAN routing.','The no shutdown command has not been configured.','The IP address on the router is incorrect.','The encapsulation dot1Q 20 command has not been configured.'],ans:[3],exp:'Each router-on-a-stick subinterface must have "encapsulation dot1Q" configured with the matching VLAN.'},
+{m:'1-4',q:'What command is required on a switch connected to Gi0/0 (router-on-a-stick) to allow inter-VLAN routing?',opts:['switchport mode access','no switchport','switchport mode trunk','switchport mode dynamic desirable'],ans:[2],exp:'The switch port connected to a router-on-a-stick must use "switchport mode trunk" to carry VLANs.'},
+{m:'1-4',q:'A high school uses VLAN15 and VLAN30. What is required to enable router-on-a-stick inter-VLAN routing?',opts:['A multilayer switch is needed.','A router with at least two LAN interfaces is needed.','Two groups of switches are needed.','A switch with a port configured as a trunk connecting to the router.'],ans:[3],exp:'Router-on-a-stick requires the switch port to the router to be a trunk port carrying all VLANs.'},
+{m:'1-4',q:'What type of port is required on a switch connected to Gi0/0 on a router configured with subinterfaces?',opts:['routed port','access port','trunk port','SVI'],ans:[2],exp:'To allow a router-on-a-stick configuration to function, the switch must connect via a trunk port.'},
+{m:'1-4',q:'When routing a large number of VLANs, what are two disadvantages of router-on-a-stick vs multilayer switch? (Choose two.)',opts:['Multiple SVIs are needed.','A dedicated router is required.','Router-on-a-stick requires subinterfaces on same subnets.','Router-on-a-stick requires multiple physical router interfaces.','Multiple subinterfaces may impact traffic flow speed.'],ans:[1,4],exp:'Router-on-a-stick needs a dedicated router and all traffic bottlenecks through one physical interface.'},
+{m:'1-4',q:'PC2 cannot communicate with PC1. The exhibit shows subinterface Gi0/0.5 is configured with the wrong VLAN. What is the problem?',opts:['Gi0/0 is not configured as a trunk port.','The command interface GigabitEthernet0/0.5 was entered incorrectly.','There is no IP address configured on Gi0/0.','The no shutdown command is not entered on subinterfaces.','The encapsulation dot1Q 5 command contains the wrong VLAN.'],ans:[4],exp:'In router-on-a-stick, the encapsulation command must match the VLAN number for the subinterface.'},
+{m:'1-4',q:'A network administrator is verifying inter-VLAN routing. Users on different VLANs cannot communicate. What are two configuration errors on switch interface Gi1/1? (Choose two.)',opts:['Gi1/1 is in the default VLAN.','Voice VLAN is not assigned to Gi1/1.','Gi1/1 is configured as trunk mode.','Negotiation of trunking is turned on.','The trunking encapsulation protocol is wrong.'],ans:[0,2],exp:'For legacy inter-VLAN routing, switch ports connecting to the router should be access mode with the correct VLAN.'},
+{m:'1-4',q:'A router-on-a-stick config shows VLAN 45 PCs cannot reach VLAN 30. Based on the exhibit, what is the most likely error?',opts:['The wrong VLAN is on GigabitEthernet 0/0.45.','The command no shutdown is missing on GigabitEthernet 0/0.30.','The GigabitEthernet 0/0 interface is missing an IP address.','There is an incorrect IP address configured on GigabitEthernet 0/0.30.'],ans:[3],exp:'An incorrect IP address on a subinterface prevents hosts in that VLAN from using the router as a gateway.'},
+{m:'1-4',q:'Host1, Host2, and Host3 are in different VLANs and cannot communicate via RT1. What is causing the problem?',opts:['Interface Fa0/0 is missing IP address configuration.','IP addresses on the subinterfaces are incorrectly matched to the VLANs.','Each subinterface of Fa0/0 needs separate no shutdown commands.','Routers do not support 802.1Q encapsulation on subinterfaces.'],ans:[1],exp:'Subinterface IP addresses must be in the same subnet as the devices in the corresponding VLAN.'},
+{m:'1-4',q:'What is the function of STP in a scalable network?',opts:['Prevent routing loops in networks with redundant paths','Provide monitoring of all switch port states','Disable redundant paths in a switched network','Allow Cisco switches to exchange routing table info'],ans:[2],exp:'STP prevents Layer-2 loops by blocking redundant switch ports while keeping them as standby backups.'},
+{m:'1-4',q:'Why would an admin segment a network with a Layer 2 switch?',opts:['To create fewer collision domains','To eliminate virtual circuits','To isolate ARP requests','To create more collision domains'],ans:[3],exp:'A Layer 2 switch creates more, smaller collision domains by giving each port dedicated bandwidth.'},
+{m:'1-4',q:'What are two actions performed by a Cisco switch when a frame arrives? (Choose two.)',opts:['Source MAC and port are added to the MAC address table.','Frame is immediately flooded to all ports.','Destination MAC is looked up in the MAC address table.','If destination MAC is not found, the frame is dropped.'],ans:[0,2],exp:'Switches learn source MAC+port and look up the destination MAC to make forwarding decisions.'},
+{m:'1-4',q:'What does "port density" represent for an Ethernet switch?',opts:['Number of hosts per switch port','Number of available ports on the switch','Speed of each port','Number of hosts that can be networked'],ans:[1],exp:'Port density = the number of physical ports on a single switch.'},
+{m:'1-4',q:'Which three statements accurately describe VLAN characteristics? (Choose three.)',opts:['VLANs logically divide a switch into multiple independent switches.','A trunk link can carry traffic for multiple VLANs.','VLANs eliminate the need for routers entirely.','Devices in different VLANs communicate directly without a router.','A VLAN is a broadcast domain created by switches.','Each VLAN requires its own IP subnet.'],ans:[0,1,4],exp:'VLANs create separate broadcast domains (logical switches), trunk links carry multiple VLANs, and each VLAN is its own broadcast domain.'},
+{m:'1-4',q:'Which three components form a bridge ID? (Choose three.)',opts:['extended system ID','cost','IP address','bridge priority','MAC address','port ID'],ans:[0,3,4],exp:'Bridge ID = Bridge priority (4-bit) + Extended system ID / VLAN (12-bit) + MAC address (48-bit).'},
+{m:'1-4',q:'Which statement describes the effect of the "no switchport access vlan 30" command on a port currently in VLAN 30?',opts:['Port Fa0/11 will shut down.','An error message would be displayed.','Port Fa0/11 will be returned to VLAN 1.','VLAN 30 will be deleted.'],ans:[2],exp:'When the no switchport access vlan command is entered, the port returns to default VLAN 1. VLAN 30 is unaffected.'},
+{m:'1-4',q:'Which inter-VLAN routing method uses subinterfaces on a single router interface?',opts:['Legacy inter-VLAN routing','Multilayer switch routing','Router-on-a-stick','SVI-based routing'],ans:[2],exp:'Router-on-a-stick uses one physical interface with multiple subinterfaces, each configured for a specific VLAN.'},
+{m:'1-4',q:'Which command would a network administrator use to verify the inter-VLAN routing configuration on a router subinterface?',opts:['show ip route','show interfaces trunk','show running-config','show vlan brief'],ans:[2],exp:'"show running-config" reveals the full subinterface configuration including encapsulation and IP addresses.'},
+{m:'1-4',q:'On a router configured for router-on-a-stick, PC2 (VLAN 10) cannot reach PC1 (VLAN 20). The GigabitEthernet 0/0.5 is configured with "encapsulation dot1Q 5". What is the most likely problem?',opts:['Gi0/0 is not configured as a trunk port.','The subinterface number does not need to match the VLAN.','There is no IP address configured on Gi0/0.','The encapsulation dot1Q 5 command contains the wrong VLAN.'],ans:[3],exp:'In router-on-a-stick, the VLAN number in the encapsulation command must match the actual VLAN of the hosts being served.'},
+/* ── Modules 5-6 ── */
+
+{m:'5-6',q:'What additional information is contained in the 12-bit extended system ID of a BPDU?',opts:['MAC address','VLAN ID','IP address','port ID'],ans:[1],exp:'The 12-bit extended system ID carries the VLAN ID, enabling per-VLAN spanning tree in PVST+.'},
+{m:'5-6',q:'During STP initialization all switches reboot. What is the FIRST step of the election process?',opts:['Switches with lower root ID stop sending BPDUs.','All switches send out BPDUs advertising themselves as the root bridge.','Each switch determines the best path to forward traffic.','Each switch determines what port to block to prevent a loop.'],ans:[1],exp:'When STP starts, every switch assumes it is root and floods BPDUs advertising itself as the root bridge.'},
+{m:'5-6',q:'Which STP port role is adopted if there is no other port with a lower cost to the root bridge?',opts:['designated port','root port','alternate','disabled port'],ans:[1],exp:'The root port is the port with the lowest cost path to reach the root bridge.'},
+{m:'5-6',q:'Which two concepts relate to a switch port intended only for end devices, never for another switch? (Choose two.)',opts:['bridge ID','edge port','extended system ID','PortFast','PVST+'],ans:[1,3],exp:'Edge port (RSTP) and PortFast (PVST+) both mark ports connected only to end devices, bypassing STP timers.'},
+{m:'5-6',q:'Which three components are combined to form a bridge ID? (Choose three.)',opts:['extended system ID','cost','IP address','bridge priority','MAC address','port ID'],ans:[0,3,4],exp:'Bridge ID = Bridge priority (4-bit) + Extended system ID / VLAN (12-bit) + MAC address (48-bit).'},
+{m:'5-6',q:'In which two port states does a switch learn MAC addresses in a PVST network? (Choose two.)',opts:['disabled','forwarding','listening','blocking','learning'],ans:[1,4],exp:'MAC learning occurs in the Learning and Forwarding port states.'},
+{m:'5-6',q:'If no bridge priority is configured in PVST, which criteria is used to elect the root bridge?',opts:['lowest MAC address','lowest IP address','highest IP address','highest MAC address'],ans:[0],exp:'If all switches have the same default priority (32768), the switch with the lowest MAC address becomes root.'},
+{m:'5-6',q:'When "show spanning-tree vlan 33" shows three ports in forwarding, in which two port roles could they be? (Choose two.)',opts:['alternate','designated','disabled','blocked','root'],ans:[1,4],exp:'Ports in forwarding state can be designated ports or root ports. Alternate and blocked ports are in discarding state.'},
+{m:'5-6',q:'What is the function of STP in a scalable network?',opts:['It decreases the failure domain size.','It protects the enterprise edge from malicious activity.','It combines multiple trunk links as one logical link.','It disables redundant paths to eliminate Layer 2 loops.'],ans:[3],exp:'STP prevents Layer 2 loops by disabling redundant physical connections while maintaining standby paths.'},
+{m:'5-6',q:'What is a characteristic of spanning tree?',opts:['It is enabled by default on Cisco switches.','It is used to discover information about adjacent Cisco devices.','It has a TTL mechanism that works at Layer 2.','It prevents propagation of Layer 2 broadcast frames.'],ans:[0],exp:'Spanning tree is enabled by default on Cisco switches. It does not use TTL and does not prevent broadcasts — it just controls the path they travel.'},
+{m:'5-6',q:'Which spanning tree standard supports only one root bridge so that traffic from all VLANs flows over the same path?',opts:['PVST+','802.1D','MST','Rapid PVST'],ans:[1],exp:'IEEE 802.1D is the original STP standard that maintains only one spanning tree instance for all VLANs.'},
+{m:'5-6',q:'What is the purpose of the Spanning Tree Protocol (STP)?',opts:['creates smaller collision domains','prevents routing loops on a router','prevents Layer 2 loops','allows Cisco devices to exchange routing updates','creates smaller broadcast domains'],ans:[2],exp:'STP creates one loop-free path through a switch network to prevent Layer 2 loops.'},
+{m:'5-6',q:'What is the value used to determine which port on a non-root bridge will become a root port in STP?',opts:['the path cost','the highest MAC address of all ports','the lowest MAC address of all ports','the VTP revision number'],ans:[0],exp:'The root port is the port with the lowest cumulative path cost to the root bridge.'},
+{m:'5-6',q:'Which switch will be the root bridge after the election when all switches have the same priority but different MAC addresses?',opts:['S1','S2 (lowest MAC)','S3','S4'],ans:[1],exp:'With identical priorities, the switch with the lowest MAC address wins the root bridge election.'},
+{m:'5-6',q:'What are two drawbacks to disabling spanning tree with multiple paths through the network? (Choose two.)',opts:['The MAC address table becomes unstable.','The switch acts like a hub.','Port security becomes unstable.','Broadcast frames are transmitted indefinitely.','Port security shuts down all ports.'],ans:[0,3],exp:'Without STP, the MAC table becomes unstable and broadcast storms loop endlessly, consuming all bandwidth.'},
+{m:'5-6',q:'A network has six Layer 2 switches with default priority 32768. Which bridge priority value would make one switch the root?',opts:['1','28672','32768','34816'],ans:[1],exp:'Bridge priority must be configured in multiples of 4096. 28672 is lower than the default 32768, so it wins the election.'},
+{m:'5-6',q:'What is the purpose of BPDU Guard?',opts:['Put PortFast port into forwarding faster','Prevent unauthorized switches from joining via PortFast ports','Elect the root bridge faster','Prevent traffic storms'],ans:[1],exp:'BPDU Guard err-disables a PortFast port the moment any BPDU arrives, blocking unauthorized switches.'},
+{m:'5-6',q:'What is the role of the root bridge in STP?',opts:['It blocks all redundant paths.','It is the logical center of the spanning tree topology.','It handles all inter-VLAN routing.','It forwards all frames without decisions.'],ans:[1],exp:'The root bridge is the reference point for the STP topology. All other switches calculate paths relative to it.'},
+{m:'5-6',q:'The administrator tried to create an EtherChannel between S1 and two other switches but was unsuccessful. What is the problem?',opts:['Traffic cannot be sent to two different switches through the same EtherChannel link.','Traffic cannot be sent to two different switches but only to EtherChannel-enabled servers.','Traffic can only use EtherChannel if implemented on Gigabit Ethernet interfaces.','Traffic can only use EtherChannel if implemented on Layer 3 switches.'],ans:[0],exp:'An EtherChannel link can only be created between two switches. It cannot be split to two different switches.'},
+{m:'5-6',q:'Which statement is true regarding the use of PAgP to create EtherChannels?',opts:['It requires full duplex.','It increases the number of ports participating in spanning tree.','It requires more physical links than LACP.','It mandates an even number of ports be used.','It is Cisco proprietary.'],ans:[4],exp:'PAgP (Port Aggregation Protocol) is Cisco proprietary and only works between Cisco devices.'},
+{m:'5-6',q:'What are two requirements to configure an EtherChannel between two switches? (Choose two.)',opts:['All interfaces need to work at the same speed.','All interfaces need to be assigned to different VLANs.','Different allowed VLAN ranges must exist on each end.','All interfaces need to be working in the same duplex mode.','The interfaces must be contiguous on the switch.'],ans:[0,3],exp:'All interfaces in an EtherChannel must operate at the same speed and duplex mode.'},
+{m:'5-6',q:'Based on the output of "show etherchannel summary", the EtherChannel uses PAgP (Cisco proprietary). What can be concluded?',opts:['The EtherChannel bundle is down.','Two Gigabit Ethernet ports are used.','A Cisco proprietary protocol was used to negotiate the EtherChannel link.','The EtherChannel bundle is operating at both Layer 2 and Layer 3.'],ans:[2],exp:'PAgP is Cisco proprietary. Its presence in the output confirms a Cisco-only EtherChannel negotiation.'},
+{m:'5-6',q:'Which two parameters must match on ports of two switches to create a PAgP EtherChannel? (Choose two.)',opts:['port ID','PAgP mode','MAC address','speed','VLAN information'],ans:[3,4],exp:'Ports must match in speed, duplex, and VLAN information. PAgP mode must be compatible but not identical.'},
+{m:'5-6',q:'SW1 interfaces are set to "on" and SW2 is set to PAgP desirable. What happens to the EtherChannel?',opts:['The EtherChannel is established after SW2 initiates.','The EtherChannel is established after SW1 initiates.','The EtherChannel is established without negotiation.','The EtherChannel fails to establish.'],ans:[3],exp:'"On" mode requires the other side to also be "on". Mixing "on" with PAgP desirable prevents EtherChannel formation.'},
+{m:'5-6',q:'SW1 is in PAgP auto mode and SW2 is in PAgP auto mode. The EtherChannel fails. What change corrects the problem?',opts:['Configure SW2 EtherChannel mode to desirable.','Configure SW2 EtherChannel mode to on.','Configure SW1 EtherChannel mode to on.','Configure SW2 EtherChannel mode to auto.'],ans:[0],exp:'Two "auto" ports will not form a channel. One side must be "desirable" to initiate PAgP negotiation.'},
+{m:'5-6',q:'An EtherChannel has three interfaces. One goes down. What is the result?',opts:['The remaining two interfaces continue to load balance traffic.','The remaining two become separate links between the switches.','One becomes an active link and the other a backup link.','The EtherChannel fails.'],ans:[0],exp:'EtherChannel remains functional as long as at least one physical link is up. Traffic is redistributed across remaining links.'},
+{m:'5-6',q:'SW1 uses "channel-group 1 mode auto". Which command on SW2 enables this EtherChannel?',opts:['SW2(config-if-range)# channel-group 1 mode passive','SW2(config-if-range)# channel-group 1 mode desirable','SW2(config-if-range)# channel-group 1 mode on','SW2(config-if-range)# channel-group 1 mode active'],ans:[1],exp:'PAgP "auto" only responds to negotiation. SW2 must be "desirable" to initiate and form the channel.'},
+{m:'5-6',q:'Which technology is an open protocol standard that allows switches to automatically bundle physical ports into a single logical link?',opts:['PAgP','LACP','Multilink PPP','DTP'],ans:[1],exp:'LACP (IEEE 802.3ad) is the open standard for EtherChannel. PAgP is Cisco proprietary.'},
+{m:'5-6',q:'What is a requirement to configure a trunking EtherChannel between two switches?',opts:['The allowed range of VLANs must be the same on both switches.','The participating interfaces must be assigned the same VLAN number on both switches.','The participating interfaces must be physically contiguous.','The participating interfaces must be on the same module.'],ans:[0],exp:'For a trunking EtherChannel, the allowed VLAN range must match on both sides.'},
+{m:'5-6',q:'What are two advantages of using LACP? (Choose two.)',opts:['It allows directly connected switches to negotiate an EtherChannel link.','It eliminates the need for trunk interfaces when deploying VLANs.','It decreases the amount of configuration needed.','It provides a simulated environment for testing link aggregation.','It allows the use of multivendor devices.','LACP allows Fast Ethernet and Gigabit Ethernet to be mixed in one EtherChannel.'],ans:[0,4],exp:'LACP is an IEEE standard that allows multivendor switches to negotiate EtherChannel links automatically.'},
+{m:'5-6',q:'A switch is configured to run STP. What term describes a non-root port that is permitted to forward traffic?',opts:['root port','designated port','alternate port','disabled'],ans:[1],exp:'A designated port is a non-root port in forwarding state that forwards traffic on its segment.'},
+{m:'5-6',q:'What are two advantages of EtherChannel? (Choose two.)',opts:['STP views physical links in an EtherChannel as one logical connection.','Load balancing occurs between links configured as different EtherChannels.','Configuring the EtherChannel interface provides consistency across physical links.','STP ensures redundancy by transitioning failed EtherChannel interfaces to forwarding.','EtherChannel uses upgraded physical links to provide increased bandwidth.'],ans:[0,2],exp:'STP treats the EtherChannel as one logical link, and configuration on the port-channel interface is applied consistently to all member ports.'},
+{m:'5-6',q:'In an RSTP-enabled network, ports A, B, C, D are shown. S1 is root. What are the possible roles for A, B, C, D?',opts:['alternate, designated, root, root','designated, alternate, root, root','alternate, root, designated, root','designated, root, alternate, root'],ans:[0],exp:'S1 is root so its port B is designated. Ports C and D on non-root switches facing root are root ports. Port A is an alternate port.'},
+{m:'5-6',q:'Which switching technology allows access layer switch links to be aggregated for more bandwidth to the Layer 3 switch?',opts:['trunking','HSRP','PortFast','EtherChannel'],ans:[3],exp:'EtherChannel bundles multiple physical links into one logical link, increasing bandwidth between switches.'},
+{m:'5-6',q:'S1 is configured in PAgP auto mode. Which mode should S2 be configured to form the EtherChannel?',opts:['auto','on','off','desirable'],ans:[3],exp:'PAgP "auto" only responds. S2 must be set to "desirable" to initiate and form the EtherChannel.'},
+{m:'5-6',q:'Which set of commands on SW1 completes the EtherChannel link to SW2 using PAgP desirable?',opts:['interface GigabitEthernet0/1 - no shutdown','interface Port-channel 1 - no shutdown','interface GigabitEthernet0/2 - channel-group 2 mode desirable','interface GigabitEthernet0/1 - channel-group 1 mode desirable'],ans:[3],exp:'"channel-group 1 mode desirable" on GigabitEthernet0/1 completes the PAgP EtherChannel configuration.'},
+{m:'5-6',q:'Which STP bridge priority value will make it LEAST likely for a switch to be selected as root?',opts:['65535','4096','32768','61440'],ans:[3],exp:'Bridge priority can range 0–61440 in multiples of 4096. Higher priority = less likely to become root.'},
+{m:'5-6',q:'In which two PVST+ port states are MAC addresses learned? (Choose two.)',opts:['learning','forwarding','disabled','listening','blocking'],ans:[0,1],exp:'MAC addresses are learned in the Learning and Forwarding PVST+ port states.'},
+{m:'5-6',q:'Which port role is assigned to the switch port that has the lowest cost to reach the root bridge?',opts:['designated port','disabled port','root port','non-designated port'],ans:[2],exp:'The root port on a non-root switch is the port with the lowest cost path to the root bridge.'},
+{m:'5-6',q:'What term describes the switch port closest in terms of overall cost to the root bridge?',opts:['root port','designated port','alternate port','disabled'],ans:[0],exp:'The root port is the closest port (lowest cost) to the root bridge on a non-root switch.'},
+{m:'5-6',q:'What term describes a field used to specify a VLAN ID in a BPDU?',opts:['extended system ID','port ID','bridge priority','bridge ID'],ans:[0],exp:'The extended system ID in the bridge ID field contains the VLAN ID in PVST+.'},
+{m:'5-6',q:'What term describes the reference point for all path calculations in STP?',opts:['root bridge','root port','designated port','alternate port'],ans:[0],exp:'The root bridge is the reference point for the entire spanning tree topology.'},
+{m:'5-6',q:'What term describes a field with a default value of 32,768 that is the initial deciding factor when electing a root bridge?',opts:['bridge priority','MAC Address','extended system ID','bridge ID'],ans:[0],exp:'The bridge priority has a default of 32768 and is the first field compared in root bridge elections.'},
+{m:'5-6',q:'Which statement describes an EtherChannel implementation?',opts:['EtherChannel operates only at Layer 2.','PAgP cannot be used in conjunction with EtherChannel.','A trunked port can be part of an EtherChannel bundle.','EtherChannel can support up to a maximum of ten separate links.'],ans:[2],exp:'EtherChannel supports both access and trunk ports. Trunked ports can be bundled into an EtherChannel.'},
+{m:'5-6',q:'The "show etherchannel summary" shows EtherChannel status as (SD). What can be concluded?',opts:['The EtherChannel is suspended.','The EtherChannel is not functional.','The port aggregation protocol PAgP is misconfigured.','FastEthernet ports do not join the EtherChannel.'],ans:[1],exp:'(SD) means the EtherChannel is a Layer 2 bundle with a Down status — it is not functional.'},
+{m:'5-6',q:'Which statement describes a characteristic of EtherChannel?',opts:['It can combine up to a maximum of 4 physical links.','It can bundle mixed types of 100Mb/s and 1Gb/s links.','It consists of multiple parallel links between a switch and a router.','It is made by combining multiple physical links seen as one link between two switches.'],ans:[3],exp:'EtherChannel bundles multiple same-speed physical links into one logical link, seen as a single connection by STP.'},
+{m:'5-6',q:'Which two channel group modes place an interface in a negotiating state using PAgP? (Choose two.)',opts:['on','desirable','active','auto','passive'],ans:[1,3],exp:'PAgP "desirable" and "auto" both place the interface in a negotiating state. "on" forces EtherChannel without negotiation.'},
+{m:'5-6',q:'Which mode configuration would form an EtherChannel without sending any negotiation traffic?',opts:['SW1: on / SW2: on','SW1: desirable / SW2: desirable','SW1: auto / SW2: auto (trunking enabled)','SW1: auto / SW2: auto (PortFast enabled)'],ans:[0],exp:'"On" mode on both sides forces EtherChannel without exchanging PAgP or LACP negotiation frames.'},
+{m:'5-6',q:'An EtherChannel was configured between S1 and S2 but the interfaces do not form an EtherChannel. What is the problem?',opts:['The port-channel number has to be different on each switch.','The switch ports were not configured with speed and duplex mode.','The switch ports must be access ports with each port having a VLAN assigned.','The EtherChannel was not configured with the same allowed range of VLANs on each interface.'],ans:[3],exp:'For a trunking EtherChannel, the allowed VLAN range must be identical on both sides.'},
+{m:'5-6',q:'When EtherChannel is configured, which mode forces an interface into a port channel without exchanging aggregation protocol packets?',opts:['active','auto','on','desirable'],ans:[2],exp:'"On" mode forces EtherChannel immediately without any PAgP or LACP negotiation.'},
+{m:'5-6',q:'What are two load-balancing methods in the EtherChannel technology? (Choose two.)',opts:['combination of source port and IP to destination port and IP','source IP to destination IP','source port to destination port','combination of source MAC and IP to destination MAC and IP','source MAC to destination MAC'],ans:[1,4],exp:'EtherChannel supports load balancing by source-to-destination IP or MAC address hashing.'},
+{m:'5-6',q:'Which protocol provides up to 16 instances of RSTP and combines many VLANs with the same physical topology into a common RSTP instance?',opts:['STP','Rapid PVST+','PVST+','MST'],ans:[3],exp:'MST (Multiple Spanning Tree) is the Cisco implementation of MSTP, providing up to 16 RSTP instances.'},
+{m:'5-6',q:'What is the outcome of a Layer 2 broadcast storm?',opts:['Routers will take over the forwarding of frames.','New traffic is discarded by the switch because it cannot be processed.','CSMA/CD will cause each host to continue transmitting frames.','ARP broadcast requests are returned to the transmitting host.'],ans:[1],exp:'During a broadcast storm, switches are overwhelmed and must discard newly arriving frames.'},
+{m:'5-6',q:'Which two network design features require STP to ensure correct network operation? (Choose two.)',opts:['static default routes','implementing VLANs to contain broadcasts','redundant links between Layer 2 switches','link-state dynamic routing with redundant routes','removing single points of failure with multiple Layer 2 switches'],ans:[2,4],exp:'STP is needed when redundant Layer 2 links exist or when multiple switches are used to eliminate single points of failure.'},
+{m:'5-6',q:'A network administrator configured an EtherChannel between two switches via four trunk links. One physical interface goes down. What happens?',opts:['STP will transition the failed interface into forwarding mode.','STP will recalculate the remaining trunk links.','The EtherChannel will transition to a down state.','The EtherChannel will remain functional.'],ans:[3],exp:'EtherChannel remains operational as long as one physical link is up. STP recalculation is not needed.'},
+];
+
+// ════════════════════════════════════════════════════════
+//  SHARED UTILS
+// ════════════════════════════════════════════════════════
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function getFiltered(f){if(f==='1-4')return QS.filter(q=>q.m==='1-4');if(f==='5-6')return QS.filter(q=>q.m==='5-6');return[...QS]}
+function toast(msg,err=false){const a=document.getElementById('toasts');const t=document.createElement('div');t.className='toast';t.style.borderColor=err?'var(--wrong)':'var(--border)';t.textContent=msg;a.appendChild(t);setTimeout(()=>t.remove(),3200)}
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function setTopNav(i){['tn0','tn1','tn2'].forEach((id,j)=>document.getElementById(id).classList.toggle('active',j===i))}
+
+// ════════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════════
+function goMain(){setTopNav(0);showView('main-home')}
+function goStudy(){setTopNav(1);showView('study-home')}
+function goBattle(){setTopNav(2);showView('battle-lobby')}
+
+// ════════════════════════════════════════════════════════
+//  STUDY — STATE
+// ════════════════════════════════════════════════════════
+let sFilter='all',sQuizData=[],sQuizIdx=0,sAnswered=false,sCorrect=0,sWrong=0;
+let sFlashData=[],sFlashIdx=0,sFlipped=false,sKnown=new Set();
+
+function sFilterStart(mode,filter){sFilter=filter;setTopNav(1);if(mode==='quiz')startQuiz();else startFlash()}
+
+// ── QUIZ ──
+function startQuiz(){sQuizData=shuffle(getFiltered(sFilter));sQuizIdx=0;sCorrect=0;sWrong=0;sAnswered=false;showView('quiz-view');renderQ()}
+
+function renderQ(){
+  const v=document.getElementById('quiz-inner');
+  if(sQuizIdx>=sQuizData.length){renderResult(v);return}
+  const q=sQuizData[sQuizIdx];const isM=q.ans.length>1;const pct=Math.round((sQuizIdx/sQuizData.length)*100);
+  v.innerHTML=`
+    <div class="stats-bar">
+      <div class="stat"><span>${sQuizData.length}</span>Total</div>
+      <div class="stat t"><span>${sQuizIdx}</span>Done</div>
+      <div class="stat c"><span>${sCorrect}</span>✓</div>
+      <div class="stat w"><span>${sWrong}</span>✗</div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="question-card">
+      <div class="question-meta">Q${sQuizIdx+1} / ${sQuizData.length} · Module ${q.m}${isM?' · Choose all that apply':''}</div>
+      <div class="question-text">${esc(q.q)}</div>
+      <div class="options" id="opts">
+        ${q.opts.map((o,i)=>`<label class="option" id="sopt${i}" onclick="sPickOpt(${i},${isM})"><input type="${isM?'checkbox':'radio'}" name="qr" value="${i}" onclick="sPickOpt(${i},${isM});event.stopPropagation()"><span>${esc(o)}</span></label>`).join('')}
+      </div>
+      <button class="check-btn" id="cbtn" onclick="sCheckAns()" disabled>Check Answer</button>
+      <div id="sfb"></div>
+      <div class="nav-btns-q" id="snavq" style="display:none">
+        <button onclick="sPrevQ()" ${sQuizIdx===0?'disabled':''}>← Prev</button>
+        <button onclick="sNextQ()">${sQuizIdx===sQuizData.length-1?'🏁 Results':'Next →'}</button>
+      </div>
+    </div>`;
+  sAnswered=false;
+}
+function sPickOpt(idx,isM){if(sAnswered)return;if(!isM)document.querySelectorAll('#opts .option').forEach(e=>e.style.borderColor='');const any=[...document.querySelectorAll('#opts input')].some(i=>i.checked);document.getElementById('cbtn').disabled=!any}
+function sCheckAns(){
+  if(sAnswered)return;sAnswered=true;
+  const q=sQuizData[sQuizIdx];const inputs=[...document.querySelectorAll('#opts input')];
+  const sel=inputs.map((inp,i)=>inp.checked?i:-1).filter(i=>i>=0);
+  const ok=q.ans.sort().join(',')===sel.sort().join(',');
+  if(ok)sCorrect++;else sWrong++;
+  inputs.forEach((_,i)=>{const el=document.getElementById('sopt'+i);el.classList.add('locked');if(q.ans.includes(i))el.classList.add('correct');else if(sel.includes(i))el.classList.add('incorrect')});
+  document.getElementById('sfb').innerHTML=`<div class="explanation${ok?'':' wrong'}"><strong>${ok?'✅ Correct!':'❌ Incorrect.'}</strong><br>${esc(q.exp)}</div>`;
+  document.getElementById('cbtn').style.display='none';document.getElementById('snavq').style.display='flex';
+}
+function sNextQ(){sQuizIdx++;renderQ()}
+function sPrevQ(){if(sQuizIdx>0){sQuizIdx--;renderQ()}}
+function renderResult(v){
+  const pct=Math.round((sCorrect/sQuizData.length)*100);
+  const msg=pct>=80?'🎉 Excellent!':pct>=60?'📚 Good effort!':'💪 Keep practicing!';
+  v.innerHTML=`<div class="result-card"><h2>${msg}</h2><div class="score-circle">${pct}%</div><p>You answered <strong>${sCorrect}</strong> of <strong>${sQuizData.length}</strong> correctly.</p><div class="result-btns"><button class="mbtn quiz" onclick="startQuiz()">🔄 Retry</button><button class="mbtn flash" onclick="startFlash()">🃏 Flashcards</button><button class="mbtn gray" onclick="goStudy()">🏠 Study Home</button></div></div>`
+}
+
+// ── FLASHCARDS ──
+function startFlash(){sFlashData=shuffle(getFiltered(sFilter));sFlashIdx=0;sFlipped=false;sKnown.clear();showView('flash-view');renderFlash()}
+function renderFlash(){
+  const v=document.getElementById('flash-inner');
+  if(!sFlashData.length){v.innerHTML='<div class="result-card"><h2>No cards</h2></div>';return}
+  const q=sFlashData[sFlashIdx];const ans=q.ans.map(i=>q.opts[i]).join(' / ');const total=sFlashData.length;const known=sKnown.size;
+  v.innerHTML=`
+    <div class="stats-bar">
+      <div class="stat t"><span>${total}</span>Total</div>
+      <div class="stat c"><span>${known}</span>Known ✓</div>
+      <div class="stat"><span>${total-known}</span>Left</div>
+    </div>
+    <div class="flash-progress"><span>Card ${sFlashIdx+1}/${total} · Module ${q.m}</span><span>${sKnown.has(sFlashIdx)?'✅ Known':''}</span></div>
+    <div class="flashcard-scene" onclick="sFlipCard()">
+      <div class="flashcard" id="fc">
+        <div class="flashcard-front"><div class="fc-tag">❓ Question</div><div class="fc-q">${esc(q.q)}</div></div>
+        <div class="flashcard-back"><div class="fc-tag" style="color:var(--correct)">✅ Answer</div><div class="fc-ans">${esc(ans)}</div><div class="fc-exp">${esc(q.exp)}</div></div>
+      </div>
+    </div>
+    <p class="flash-tap-hint">👆 Tap card to reveal answer</p>
+    <div class="flash-nav">
+      <button onclick="sFlashPrev()">← Prev</button>
+      <span class="flash-counter">${sFlashIdx+1}/${total}</span>
+      <button onclick="sFlashNext()">Next →</button>
+    </div>
+    <div class="flash-extras">
+      <button class="known-btn" onclick="sMarkKnown()">✓ Mark Known</button>
+      <button class="ghost-btn" onclick="sReshuffle()">🔀 Shuffle</button>
+      <button class="ghost-btn" onclick="goStudy()">🏠 Home</button>
+    </div>`;
+  sFlipped=false;
+}
+function sFlipCard(){sFlipped=!sFlipped;const fc=document.getElementById('fc');if(fc)fc.classList.toggle('flipped',sFlipped)}
+function sFlashNext(){sFlashIdx=(sFlashIdx+1)%sFlashData.length;renderFlash()}
+function sFlashPrev(){sFlashIdx=(sFlashIdx-1+sFlashData.length)%sFlashData.length;renderFlash()}
+function sMarkKnown(){sKnown.add(sFlashIdx);sFlashNext()}
+function sReshuffle(){sFlashData=shuffle(sFlashData);sFlashIdx=0;sKnown.clear();renderFlash()}
+
+// ════════════════════════════════════════════════════════
+//  BATTLE — STATE
+// ════════════════════════════════════════════════════════
+const MAX_PLAYERS = 8;      // 1 host + 7 guests
+const CIRC = 113;
+let TIMER_SEC = 15;
+let peer = null;
+let isHost = false;
+let myName = 'Player';
+let hostTopic = 'all';
+let totalRounds = 10;
+
+// Host-side
+let guestConns = [];
+let hostScore = 0;
+
+// Guest-side
+let hostConn = null;
+let myScore = 0;
+
+// Shared per-round
+let roundQuestions = [];
+let currentRound = 0;
+let currentQ = null;
+let bAnswered = false;
+let selOpts = new Set();
+let myAnsData = null;
+let bTimerIv = null;
+let timeLeft = 0;
+let roundResolved = false;
+
+// Host-side round deadline timer
+let hostResolveTimer = null;
+
+// Guest-side watchdog
+let guestWatchdog = null;
+
+// All-players score table
+let allPlayers = [];
+
+function bShowCreate(){showView('battle-create')}
+function bShowJoin(){showView('battle-join')}
+function bBack(){
+  clearHostResolveTimer();
+  clearTimeout(guestWatchdog);
+  clearInterval(bTimerIv);
+  if(peer){try{peer.destroy()}catch(e){}}
+  peer=null;guestConns=[];hostConn=null;roundResolved=false;bAnswered=false;
+  showView('battle-lobby');setTopNav(2);
+}
+
+function setHostTopic(el){
+  document.querySelectorAll('#host-topic .topic-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');hostTopic=el.dataset.v;
+  const pool=getFiltered(hostTopic);const maxQ=pool.length;
+  document.getElementById('rounds-max-hint').textContent='(max '+maxQ+')';
+  document.getElementById('custom-rounds').max=maxQ;
+}
+function setRounds(el){
+  document.querySelectorAll('#host-rounds .topic-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');totalRounds=parseInt(el.dataset.v);
+  document.getElementById('custom-rounds').value='';
+}
+function setCustomRounds(inp){
+  document.querySelectorAll('#host-rounds .topic-pill').forEach(p=>p.classList.remove('active'));
+  const v=parseInt(inp.value);if(!isNaN(v)&&v>0)totalRounds=v;
+}
+function setTimer(el){
+  document.querySelectorAll('#host-timer .topic-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');TIMER_SEC=parseInt(el.dataset.v);
+}
+
+// ── Create Room (Host) ──
+function createRoom(){
+  const name=document.getElementById('host-name').value.trim()||'Host';
+  myName=name;isHost=true;
+  if(peer){try{peer.destroy()}catch(e){}}
+  const roomId=Math.random().toString(36).substr(2,6).toUpperCase();
+  peer=new Peer(roomId,{debug:0});
+  peer.on('open',id=>{
+    document.getElementById('room-created').style.display='block';
+    document.getElementById('room-code-display').textContent=id;
+    const url=location.origin+location.pathname+'?join='+id;
+    document.getElementById('share-link').textContent=url;
+    updateHostWaiting();
+  });
+  peer.on('connection',conn=>{
+    if(guestConns.length>=MAX_PLAYERS-1){conn.close();return;}
+    conn.on('open',()=>{
+      const entry={conn,name:'Guest',score:0,id:conn.peer,ansData:null};
+      guestConns.push(entry);
+      conn.on('data',msg=>handleHostMsg(msg,entry));
+      conn.on('close',()=>{
+        guestConns=guestConns.filter(g=>g.id!==entry.id);
+        updateHostWaiting();
+        broadcastScores();
+        hostMaybeResolve();
+      });
+      conn.on('error',()=>{
+        guestConns=guestConns.filter(g=>g.id!==entry.id);
+        updateHostWaiting();
+      });
+    });
+  });
+  peer.on('error',e=>toast('⚠️ '+e.type,true));
+}
+function updateHostWaiting(){
+  const n=guestConns.length;
+  document.getElementById('player-count').textContent=n+'/'+(MAX_PLAYERS-1);
+  const list=document.getElementById('player-list');
+  if(list)list.innerHTML='<b style="color:var(--text)">'+esc(myName)+' (Host)</b><br>'+
+    guestConns.map(g=>'👤 '+esc(g.name)).join('<br>');
+  const btn=document.getElementById('start-btn');
+  if(btn)btn.style.display=n>=1?'block':'none';
+}
+function copyLink(){navigator.clipboard?.writeText(document.getElementById('share-link').textContent);toast('Link copied!')}
+function copyCode(){navigator.clipboard?.writeText(document.getElementById('room-code-display').textContent);toast('Code copied!')}
+
+// ── Join Room (Guest) ──
+function joinRoom(){
+  const code=document.getElementById('join-code').value.trim().toUpperCase();
+  const name=document.getElementById('guest-name').value.trim()||'Guest';
+  if(!code){document.getElementById('join-error').textContent='Please enter a room code.';return}
+  document.getElementById('join-error').textContent='';
+  myName=name;isHost=false;myScore=0;
+  if(peer){try{peer.destroy()}catch(e){}}
+  peer=new Peer(undefined,{debug:0});
+  peer.on('open',()=>{
+    hostConn=peer.connect(code,{reliable:true});
+    hostConn.on('open',()=>{
+      hostConn.send({type:'hello',name:myName});
+      toast('Connected to room!');
+    });
+    hostConn.on('data',handleGuestMsg);
+    hostConn.on('close',()=>toast('⚠️ Host disconnected.',true));
+    hostConn.on('error',()=>toast('⚠️ Connection error',true));
+  });
+  peer.on('error',e=>{document.getElementById('join-error').textContent='Could not find room. Check the code.';toast('⚠️ '+e.type,true)});
+}
+
+// ── Host receives message from a guest ──
+function handleHostMsg(msg,entry){
+  if(msg.type==='hello'){
+    entry.name=msg.name;
+    toast('👋 '+msg.name+' joined!');
+    updateHostWaiting();
+    try{entry.conn.send({type:'hello_ack'})}catch(e){}
+    broadcastScores();
+  }
+  if(msg.type==='answer'){
+    entry.ansData=msg;
+    hostMaybeResolve();
+  }
+}
+
+// ── Guest receives message from host ──
+function handleGuestMsg(msg){
+  switch(msg.type){
+    case 'hello_ack':
+      break;
+    case 'scores':
+      allPlayers=msg.players;renderScoreboard();
+      break;
+    case 'start':
+      // Full reset for a new game
+      clearTimeout(guestWatchdog);
+      clearInterval(bTimerIv);
+      totalRounds=msg.totalRounds;
+      roundQuestions=msg.questions;
+      TIMER_SEC=msg.timerSec||15;
+      allPlayers=msg.players||[];
+      myScore=0;
+      currentRound=0;
+      currentQ=null;
+      bAnswered=false;
+      selOpts.clear();
+      myAnsData=null;
+      roundResolved=false;
+      bUpdateSB();
+      startCountdown(()=>bNextRound());
+      break;
+    case 'result':
+      clearTimeout(guestWatchdog);
+      applyResult(msg);
+      break;
+    case 'next':
+      // CRITICAL: reset all per-round state so the guest can click again
+      clearTimeout(guestWatchdog);
+      clearInterval(bTimerIv);
+      currentRound=msg.round;
+      allPlayers=msg.players||allPlayers;
+      currentQ=null;
+      bAnswered=false;
+      selOpts.clear();
+      myAnsData=null;
+      roundResolved=false;
+      showView('battle-game');setTopNav(2);
+      bUpdateSB();
+      bLoadQ();
+      bStartTimer();
+      break;
+    case 'gameover':
+      clearTimeout(guestWatchdog);
+      allPlayers=msg.players;showBattleResults(msg.winner);
+      break;
+  }
+}
+
+// ── Host broadcasts to all guests ──
+function broadcast(data){guestConns.forEach(g=>{if(g.conn&&g.conn.open)try{g.conn.send(data)}catch(e){}})}
+function broadcastScores(){
+  const players=buildPlayerList();
+  broadcast({type:'scores',players});
+}
+function buildPlayerList(){
+  const list=[{id:'host',name:myName,score:hostScore}];
+  guestConns.forEach(g=>list.push({id:g.id,name:g.name,score:g.score}));
+  return list;
+}
+
+// ── Host force-start ──
+function hostForceStart(){
+  if(guestConns.length<1){toast('Need at least 1 player to start!',true);return;}
+  hostStartGame();
+}
+
+function hostStartGame(){
+  let pool=QS.filter(q=>hostTopic==='all'||q.m===hostTopic);
+  const actualRounds=Math.min(totalRounds,pool.length);
+  pool=shuffle(pool).slice(0,actualRounds);
+  roundQuestions=pool;totalRounds=pool.length;
+  hostScore=0;guestConns.forEach(g=>{g.score=0;g.ansData=null});
+  currentRound=0;currentQ=null;
+  bAnswered=false;selOpts.clear();myAnsData=null;roundResolved=false;
+  allPlayers=buildPlayerList();
+  broadcast({type:'start',totalRounds,questions:pool,timerSec:TIMER_SEC,players:allPlayers});
+  bUpdateSB();startCountdown(()=>bNextRound());
+}
+
+function startCountdown(cb){
+  showView('battle-countdown');setTopNav(2);let n=3;
+  document.getElementById('cnt-num').textContent=n;
+  const iv=setInterval(()=>{n--;if(n<=0){clearInterval(iv);document.getElementById('cnt-num').textContent='⚡';setTimeout(cb,500)}else document.getElementById('cnt-num').textContent=n},900);
+}
+
+function bNextRound(){
+  if(currentRound>=totalRounds){if(isHost)bEndGame();return}
+  clearHostResolveTimer();
+  clearTimeout(guestWatchdog);
+  clearInterval(bTimerIv);
+  bAnswered=false;selOpts.clear();myAnsData=null;currentQ=null;
+  if(isHost)guestConns.forEach(g=>{g.ansData=null});
+  roundResolved=false;
+  showView('battle-game');setTopNav(2);bUpdateSB();bLoadQ();
+  bStartTimer();
+  if(isHost)hostStartRoundDeadline();
+}
+function bLoadQ(){currentQ=roundQuestions[currentRound];bRenderQ();}
+
+function bStartTimer(){
+  clearInterval(bTimerIv);timeLeft=TIMER_SEC;bUpdateArc();
+  bTimerIv=setInterval(()=>{timeLeft--;bUpdateArc();if(timeLeft<=0){clearInterval(bTimerIv);if(!bAnswered)bAutoSubmit()}},1000);
+}
+function bUpdateArc(){
+  const arc=document.getElementById('timer-arc');if(!arc)return;
+  const pct=Math.max(0,timeLeft/TIMER_SEC);arc.style.strokeDashoffset=CIRC*(1-pct);
+  arc.style.stroke=pct>.5?'var(--primary)':pct>.25?'var(--accent)':'var(--wrong)';
+}
+function bUpdateSB(){
+  const rd=document.getElementById('round-display');
+  if(rd)rd.textContent=(currentRound+1)+'/'+totalRounds;
+  renderScoreboard();
+}
+function renderScoreboard(){
+  const sb=document.getElementById('scoreboard-row');if(!sb)return;
+  const players=isHost?buildPlayerList():allPlayers;
+  sb.innerHTML=players.map(p=>`<div class="ps-chip"><div class="ps-name">${esc(p.name)}${p.id==='host'?' 👑':''}</div><div class="ps-pts">${p.score}</div></div>`).join('');
+}
+
+function bRenderQ(){
+  const q=currentQ;if(!q){document.getElementById('game-body').innerHTML='<div class="wait-state">Waiting for next round…</div>';return}
+  const isM=q.ans.length>1;const letters=['A','B','C','D','E','F'];
+  document.getElementById('game-body').innerHTML=`
+    <div class="q-card">
+      <span class="tag-mod">Module ${q.m}</span>
+      <div class="q-num">Round ${currentRound+1} of ${totalRounds}</div>
+      <div class="q-text">${esc(q.q)}</div>
+    </div>
+    ${isM?'<div class="multi-hint">⚡ Select ALL correct answers, then submit</div>':''}
+    <div class="opts-grid">${q.opts.map((o,i)=>`<button class="opt-btn" id="ob${i}" onclick="bPickOpt(${i})"><span class="opt-letter">${letters[i]||'?'}</span>${esc(o)}</button>`).join('')}</div>
+    ${isM?'<div class="submit-row"><button class="btn btn-p" id="subm" onclick="bSubmitAns()" disabled>Submit →</button></div>':''}
+    <div id="bfb"></div>`;
+}
+
+function bPickOpt(i){
+  if(bAnswered)return;
+  const q=currentQ;if(!q)return;
+  const isM=q.ans.length>1;const btn=document.getElementById('ob'+i);
+  if(!btn||btn.disabled)return;
+  if(!isM){
+    document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selOpts.clear();selOpts.add(i);
+    bSubmitAns();
+  }else{
+    if(selOpts.has(i)){selOpts.delete(i);btn.classList.remove('selected')}
+    else{selOpts.add(i);btn.classList.add('selected')}
+    const s=document.getElementById('subm');if(s)s.disabled=selOpts.size===0;
+  }
+}
+
+function bSubmitAns(){
+  if(bAnswered)return;bAnswered=true;clearInterval(bTimerIv);
+  myAnsData={type:'answer',opts:[...selOpts].sort(),time:Date.now(),round:currentRound};
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('bfb');
+  if(fb)fb.innerHTML='<div class="fb-banner info">⏳ Waiting for others…</div>';
+  if(isHost){
+    hostMaybeResolve();
+  }else{
+    if(hostConn&&hostConn.open)hostConn.send(myAnsData);
+    guestArmWatchdog();
+  }
+}
+function bAutoSubmit(){
+  if(bAnswered)return;bAnswered=true;clearInterval(bTimerIv);
+  myAnsData={type:'answer',opts:[],time:Date.now(),round:currentRound,timedOut:true};
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('bfb');
+  if(fb)fb.innerHTML='<div class="fb-banner tie">⏰ Time\'s up!</div>';
+  if(isHost){hostMaybeResolve();}
+  else{if(hostConn&&hostConn.open)hostConn.send(myAnsData);guestArmWatchdog();}
+}
+
+// Host: check if round can resolve now (all answered) — resolve if so
+function hostMaybeResolve(){
+  if(!isHost||roundResolved)return;
+  if(!myAnsData||myAnsData.round!==currentRound)return;
+  const allGuestsIn=guestConns.length===0 || guestConns.every(g=>g.ansData&&g.ansData.round===currentRound);
+  if(allGuestsIn){
+    clearHostResolveTimer();
+    resolveRound();
+  }
+}
+
+// Host: hard deadline — after timer + grace, force-resolve missing answers as timeouts
+function hostStartRoundDeadline(){
+  clearHostResolveTimer();
+  const grace=(TIMER_SEC+3)*1000;
+  hostResolveTimer=setTimeout(()=>{
+    if(roundResolved)return;
+    guestConns.forEach(g=>{
+      if(!g.ansData||g.ansData.round!==currentRound){
+        g.ansData={opts:[],time:Date.now(),round:currentRound,timedOut:true};
+      }
+    });
+    if(!myAnsData||myAnsData.round!==currentRound){
+      myAnsData={opts:[],time:Date.now(),round:currentRound,timedOut:true};
+    }
+    resolveRound();
+  },grace);
+}
+function clearHostResolveTimer(){if(hostResolveTimer){clearTimeout(hostResolveTimer);hostResolveTimer=null}}
+
+// Guest: watchdog — if no result within timer+8s, show notice
+function guestArmWatchdog(){
+  clearTimeout(guestWatchdog);
+  guestWatchdog=setTimeout(()=>{
+    const fb=document.getElementById('bfb');
+    if(fb&&/Waiting|Time/.test(fb.textContent)){
+      fb.innerHTML='<div class="fb-banner lose">⚠️ Host did not respond in time. Waiting…</div>';
+    }
+  },(TIMER_SEC+8)*1000);
+}
+
+// Host resolves the round
+function resolveRound(){
+  if(roundResolved)return;
+  if(!currentQ)return;
+  roundResolved=true;
+  clearHostResolveTimer();
+  const q=currentQ;const correct=[...q.ans].sort();
+  const subs=[
+    {id:'host',name:myName,opts:(myAnsData&&myAnsData.opts)||[],time:(myAnsData&&myAnsData.time)||Date.now(),timedOut:!!(myAnsData&&myAnsData.timedOut)}
+  ];
+  guestConns.forEach(g=>{
+    const a=g.ansData||{opts:[],time:Date.now(),timedOut:true};
+    subs.push({id:g.id,name:g.name,opts:a.opts||[],time:a.time||Date.now(),timedOut:!!a.timedOut});
+  });
+  const corrects=subs.filter(s=>!s.timedOut && JSON.stringify(s.opts)===JSON.stringify(correct));
+  corrects.sort((a,b)=>a.time-b.time);
+  const winnerId=corrects.length>0?corrects[0].id:null;
+  if(winnerId==='host')hostScore++;
+  else if(winnerId){const g=guestConns.find(g=>g.id===winnerId);if(g)g.score++;}
+  allPlayers=buildPlayerList();
+  const winnerName=winnerId?(subs.find(s=>s.id===winnerId)||{}).name||null:null;
+  const result={type:'result',winner:winnerId,winnerName,correctOpts:correct,players:allPlayers,exp:q.exp,round:currentRound};
+  broadcast(result);
+  applyResult(result);
+}
+
+function applyResult(msg){
+  if(msg.players)allPlayers=msg.players;
+  if(!isHost&&msg.players){
+    const me=allPlayers.find(p=>p.name===myName);
+    if(me)myScore=me.score;
+  }
+  bUpdateSB();
+  // Highlight correct options
+  if(Array.isArray(msg.correctOpts)){
+    msg.correctOpts.forEach(i=>{const b=document.getElementById('ob'+i);if(b){b.classList.remove('selected');b.classList.add('reveal-correct')}});
+  }
+  // Highlight my wrong selections
+  if(myAnsData&&Array.isArray(myAnsData.opts)){
+    myAnsData.opts.forEach(i=>{
+      const b=document.getElementById('ob'+i);
+      if(b&&!(msg.correctOpts||[]).includes(i))b.classList.add('b-incorrect');
+    });
+  }
+  const iWon=msg.winner&&(isHost?msg.winner==='host':msg.winnerName===myName);
+  let bc='info',bt='🤝 Nobody answered correctly';
+  if(msg.winner){
+    if(iWon){bc='win';bt='🎉 You got it first! +1 point'}
+    else{bc='lose';bt='😓 '+esc(msg.winnerName)+' was first!'}
+  }
+  const fb=document.getElementById('bfb');
+  if(fb)fb.innerHTML=`<div class="fb-banner ${bc}">${bt}</div><div class="exp-box"><strong style="color:var(--text)">Explanation:</strong> ${esc(msg.exp)}</div>`;
+  setTimeout(()=>{
+    currentRound++;
+    if(currentRound>=totalRounds){
+      if(isHost)bEndGame();
+    } else {
+      if(isHost){
+        broadcast({type:'next',round:currentRound,players:allPlayers});
+        bNextRound();
+      }
+      // Guests advance via the 'next' message
+    }
+  },3500);
+}
+
+function bEndGame(){
+  allPlayers=buildPlayerList();
+  broadcast({type:'gameover',players:allPlayers,winner:allPlayers.slice().sort((a,b)=>b.score-a.score)[0]?.name});
+  showBattleResults();
+}
+function showBattleResults(){
+  clearInterval(bTimerIv);
+  clearHostResolveTimer();
+  clearTimeout(guestWatchdog);
+  const sorted=(isHost?buildPlayerList():allPlayers).slice().sort((a,b)=>b.score-a.score);
+  const medals=['🥇','🥈','🥉'];
+  const myEntry=sorted.find(p=>p.name===myName)||(isHost?sorted.find(p=>p.id==='host'):null);
+  const iWon=myEntry&&sorted[0]&&sorted[0].name===myName;
+  document.getElementById('res-trophy').textContent=iWon?'🏆':'🎖️';
+  document.getElementById('res-title').textContent=iWon?'You Win! 🎉':'Game Over';
+  document.getElementById('res-title').className='res-title '+(iWon?'win':'');
+  document.getElementById('res-sub').textContent='Final Leaderboard';
+  document.getElementById('res-leaderboard').innerHTML=sorted.map((p,i)=>`
+    <div class="ss-card" style="${i===0?'border-color:var(--accent);':''}">
+      <div class="ss-name">${medals[i]||'#'+(i+1)} ${esc(p.name)}</div>
+      <div class="ss-pts">${p.score}</div>
+    </div>`).join('');
+  showView('battle-results');setTopNav(2);
+}
+function bPlayAgain(){if(isHost){bBack();setTimeout(()=>bShowCreate(),100)}else{goBattle()}}
+
+// ── AUTO-JOIN FROM URL ──
+window.addEventListener('DOMContentLoaded',()=>{
+  const code=new URLSearchParams(location.search).get('join');
+  if(code){setTopNav(2);showView('battle-join');document.getElementById('join-code').value=code.toUpperCase();toast('Room code loaded — enter your name and join!')}
+});
+</script>
+</body>
+</html>
